@@ -10,9 +10,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
-        // Redirect to their appropriate dashboard if they try to access a page not for their role
-        // or just home
-        return <Navigate to="/" replace />;
+        // Redirect to their appropriate dashboard based on their role
+        const dashboardMap = {
+            'admin': '/dashboard/admin',
+            'employer': '/dashboard/employer',
+            'jobseeker': '/dashboard/jobseeker'
+        };
+
+        const redirectPath = dashboardMap[user.role] || '/';
+        return <Navigate to={redirectPath} replace />;
     }
 
     return children;

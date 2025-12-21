@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         logout();
@@ -39,11 +40,18 @@ const Navbar = () => {
                 <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} id="navbarNav">
                     <ul className="navbar-nav mx-auto">
                         <li className="nav-item"><Link className="nav-link" to="/">Home</Link></li>
-                        <li className="nav-item"><Link className="nav-link" to="/search">Find Jobs</Link></li>
+                        <li className="nav-item"><Link className="nav-link" to="/jobs">Find Jobs</Link></li>
                         <li className="nav-item"><Link className="nav-link" to="/companies">Companies</Link></li>
                         <li className="nav-item"><Link className="nav-link" to="/about">About Us</Link></li>
                         {user && (
-                            <li className="nav-item"><Link className="nav-link fw-bold text-primary" to={getDashboardLink()}>Dashboard</Link></li>
+                            <li className="nav-item">
+                                <Link
+                                    className={`nav-link ${location.pathname.startsWith('/dashboard') ? 'active' : ''}`}
+                                    to={getDashboardLink()}
+                                >
+                                    Dashboard
+                                </Link>
+                            </li>
                         )}
                         <li className="nav-item"><Link className="nav-link" to="/blog">Blog</Link></li>
                     </ul>

@@ -1,13 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
+import JobSeekerService from '../services/JobSeekerService';
 
 const JobSeekerAlerts = () => {
-    const [alertsEnabled, setAlertsEnabled] = useState(true);
     const [preferences, setPreferences] = useState({
-        keywords: 'React, Node.js, Remote',
-        location: 'Nairobi',
-        type: 'Full-time'
+        keywords: '',
+        location: '',
+        jobType: 'Full-time',
+        isEnabled: true,
+        emailNotification: true,
+        pushNotification: false
     });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAlerts = async () => {
+            try {
+                const res = await JobSeekerService.getJobAlerts();
+                if (res.data) {
+                    setPreferences({
+                        keywords: res.data.keywords || '',
+                        location: res.data.location || '',
+                        jobType: res.data.jobType || 'Full-time',
+                        isEnabled: res.data.isEnabled !== false,
+                        emailNotification: res.data.emailNotification !== false,
+                        pushNotification: res.data.pushNotification || false
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching alerts:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAlerts();
+    }, []);
+
+    const handleUpdate = async (e) => {
+        if (e) e.preventDefault();
+        try {
+            await JobSeekerService.updateJobAlerts(preferences);
+            alert('Alert preferences updated successfully!');
+        } catch (error) {
+            console.error("Error updating alerts:", error);
+            alert('Failed to update alert preferences.');
+        }
+    };
 
     return (
         <DashboardLayout role="jobseeker">
@@ -20,19 +58,19 @@ const JobSeekerAlerts = () => {
                             <h5 className="fw-bold mb-0">Preferences</h5>
                             <div className="form-check form-switch">
                                 <label className="form-check-label small text-muted me-2" htmlFor="alertToggle">
-                                    {alertsEnabled ? 'ON' : 'OFF'}
+                                    {preferences.isEnabled ? 'ON' : 'OFF'}
                                 </label>
                                 <input
                                     className="form-check-input"
                                     type="checkbox"
                                     id="alertToggle"
-                                    checked={alertsEnabled}
-                                    onChange={() => setAlertsEnabled(!alertsEnabled)}
+                                    checked={preferences.isEnabled}
+                                    onChange={() => setPreferences({ ...preferences, isEnabled: !preferences.isEnabled })}
                                 />
                             </div>
                         </div>
 
-                        <form className={!alertsEnabled ? 'opacity-50' : ''}>
+                        <form className={!preferences.isEnabled ? 'opacity-50' : ''} onSubmit={handleUpdate}>
                             <div className="mb-4">
                                 <label className="form-label small fw-bold">Keywords / Job Titles</label>
                                 <input
@@ -40,7 +78,7 @@ const JobSeekerAlerts = () => {
                                     className="form-control"
                                     value={preferences.keywords}
                                     onChange={(e) => setPreferences({ ...preferences, keywords: e.target.value })}
-                                    disabled={!alertsEnabled}
+                                    disabled={!preferences.isEnabled}
                                 />
                                 <div className="form-text small">Enter comma separated roles (e.g., UI Designer, Project Manager)</div>
                             </div>
@@ -53,21 +91,23 @@ const JobSeekerAlerts = () => {
                                         className="form-control"
                                         value={preferences.location}
                                         onChange={(e) => setPreferences({ ...preferences, location: e.target.value })}
-                                        disabled={!alertsEnabled}
+                                        disabled={!preferences.isEnabled}
                                     />
                                 </div>
                                 <div className="col-md-6">
                                     <label className="form-label small fw-bold">Job type</label>
                                     <select
                                         className="form-select"
-                                        value={preferences.type}
-                                        onChange={(e) => setPreferences({ ...preferences, type: e.target.value })}
-                                        disabled={!alertsEnabled}
+                                        value={preferences.jobType}
+                                        onChange={(e) => setPreferences({ ...preferences, jobType: e.target.value })}
+                                        disabled={!preferences.isEnabled}
                                     >
                                         <option>Full-time</option>
                                         <option>Part-time</option>
                                         <option>Contract</option>
                                         <option>Freelance</option>
+                                        <option>Internship</option>
+                                        <option>Temporary</option>
                                     </select>
                                 </div>
                             </div>
@@ -76,17 +116,31 @@ const JobSeekerAlerts = () => {
                                 <label className="form-label small fw-bold">Notification Method</label>
                                 <div className="d-flex gap-4">
                                     <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" defaultChecked id="emailAlert" disabled={!alertsEnabled} />
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="emailAlert"
+                                            checked={preferences.emailNotification}
+                                            onChange={() => setPreferences({ ...preferences, emailNotification: !preferences.emailNotification })}
+                                            disabled={!preferences.isEnabled}
+                                        />
                                         <label className="form-check-label small" htmlFor="emailAlert">Email</label>
                                     </div>
                                     <div className="form-check">
-                                        <input className="form-check-input" type="checkbox" id="pushAlert" disabled={!alertsEnabled} />
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="pushAlert"
+                                            checked={preferences.pushNotification}
+                                            onChange={() => setPreferences({ ...preferences, pushNotification: !preferences.pushNotification })}
+                                            disabled={!preferences.isEnabled}
+                                        />
                                         <label className="form-check-label small" htmlFor="pushAlert">In-app Notification</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <button type="button" className="btn btn-teal text-white w-100 py-2" disabled={!alertsEnabled} onClick={() => alert('Alert settings saved!')}>
+                            <button type="submit" className="btn btn-teal text-white w-100 py-2" disabled={!preferences.isEnabled}>
                                 Update Alert Preferences
                             </button>
                         </form>

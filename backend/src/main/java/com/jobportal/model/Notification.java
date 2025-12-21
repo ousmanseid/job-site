@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,39 +15,40 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class Notification {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
+
     @Column(nullable = false, length = 200)
     private String title;
-    
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String message;
-    
+
     @Column(length = 50)
     @Enumerated(EnumType.STRING)
     private NotificationType type;
-    
+
     @Column(length = 255)
     private String relatedUrl;
-    
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean isRead = false;
-    
+
     private LocalDateTime readAt;
-    
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     public enum NotificationType {
         JOB_APPLICATION,
         APPLICATION_STATUS,

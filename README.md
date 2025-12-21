@@ -101,7 +101,7 @@ Job-Portal-System/
    mvn spring-boot:run
    ```
 
-   The API will be available at: `http://localhost:8080/api`
+   The API will be available at: `http://localhost:8085/api`
 
 ### Frontend Setup
 
@@ -222,7 +222,7 @@ Job-Portal-System/
 
 ### Frontend Issues
 - **CORS errors**: Check CORS configuration in SecurityConfig
-- **API calls failing**: Verify backend is running on port 8080
+- **API calls failing**: Verify backend is running on port 8085
 - **Login not working**: Check browser console for errors
 
 ## 📄 License

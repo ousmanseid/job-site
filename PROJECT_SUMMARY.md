@@ -133,7 +133,7 @@ Total Project Files: 47+
               │ HTTP/REST API (Proxy)
               │ JWT Authentication
 ┌─────────────▼───────────────────────────┐
-│      Backend (Port 8080)                │
+│      Backend (Port 8085)                │
 │   Spring Boot + Spring Security         │
 │   JWT + JPA + Hibernate                 │
 └─────────────┬───────────────────────────┘

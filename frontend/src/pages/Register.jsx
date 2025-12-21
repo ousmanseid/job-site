@@ -1,15 +1,20 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AuthService from '../services/AuthService'
 
 const Register = () => {
     const [role, setRole] = useState('jobseeker');
     const [formData, setFormData] = useState({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         companyName: '',
-        companyDetails: ''
+        companyDetails: '',
+        phone: '',
+        location: ''
     });
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -18,16 +23,33 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // In a real app, this would call the API
-        console.log('Registering:', { ...formData, role });
+        setError('');
 
-        if (role === 'employer') {
-            alert('Registration successful! Please wait for Admin approval before you can post jobs.');
-        } else {
-            alert('Registration successful!');
-        }
-
-        navigate('/login');
+        AuthService.register(
+            formData.firstName,
+            formData.lastName,
+            formData.email,
+            formData.password,
+            role,
+            formData.companyName,
+            formData.companyDetails,
+            formData.phone,
+            formData.location
+        ).then(
+            () => {
+                alert('Registration successful!');
+                navigate('/login');
+            },
+            (error) => {
+                const resMessage =
+                    (error.response &&
+                        error.response.data &&
+                        error.response.data.message) ||
+                    error.message ||
+                    error.toString();
+                setError(resMessage);
+            }
+        );
     };
 
     return (
@@ -36,6 +58,8 @@ const Register = () => {
                 <div className="col-md-6">
                     <div className="card border-0 shadow p-4 rounded-4">
                         <h3 className="fw-bold text-center mb-4">Create Account</h3>
+
+                        {error && <div className="alert alert-danger">{error}</div>}
 
                         <div className="d-flex gap-2 mb-4">
                             <button
@@ -53,15 +77,27 @@ const Register = () => {
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <div className="mb-3">
-                                <label className="form-label">{role === 'employer' ? 'Contact Person Name' : 'Full Name'}</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    className="form-control"
-                                    onChange={handleChange}
-                                    required
-                                />
+                            <div className="row">
+                                <div className="col-md-6 mb-3">
+                                    <label className="form-label">First Name</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 mb-3">
+                                    <label className="form-label">Last Name</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
                             </div>
 
                             {role === 'employer' && (
@@ -88,6 +124,31 @@ const Register = () => {
                                 />
                             </div>
 
+                            <div className="row">
+                                <div className="col-md-6 mb-3">
+                                    <label className="form-label">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        placeholder="+1 234 567 890"
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 mb-3">
+                                    <label className="form-label">Location (City)</label>
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        placeholder="e.g. New York, USA"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
                             {role === 'employer' && (
                                 <div className="mb-3">
                                     <label className="form-label">Company Details</label>
@@ -108,8 +169,10 @@ const Register = () => {
                                     name="password"
                                     className="form-control"
                                     onChange={handleChange}
+                                    minLength={4}
                                     required
                                 />
+                                <div className="form-text">Minimum 4 characters</div>
                             </div>
 
                             <button type="submit" className="btn btn-primary w-100 btn-lg mb-3">Sign Up</button>

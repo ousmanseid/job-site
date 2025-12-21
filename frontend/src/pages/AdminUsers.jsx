@@ -1,25 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
+import AdminService from '../services/AdminService';
 
 const AdminUsers = () => {
-    const [users, setUsers] = useState([
-        { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Job Seeker', status: 'Active', joined: 'Oct 20, 2024' },
-        { id: 2, name: 'TechCorp Admin', email: 'hr@techcorp.com', role: 'Employer', status: 'Active', joined: 'Oct 18, 2024' },
-        { id: 3, name: 'Alice Smith', email: 'alice@web.com', role: 'Job Seeker', status: 'Suspended', joined: 'Oct 15, 2024' },
-        { id: 4, name: 'Global Sol', email: 'contact@globalsol.com', role: 'Employer', status: 'Active', joined: 'Oct 12, 2024' },
-    ]);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState('All Roles');
 
-    const handleStatus = (id, newStatus) => {
-        setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const res = await AdminService.getAllUsers();
+            if (res && Array.isArray(res.data)) {
+                setUsers(res.data);
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const handleStatus = async (id, action) => {
+        try {
+            if (action === 'Suspend') {
+                await AdminService.deactivateUser(id);
+            } else if (action === 'Delete') {
+                if (window.confirm('Are you sure you want to delete this user?')) {
+                    await AdminService.deleteUser(id);
+                } else return;
+            } else if (action === 'Activate') {
+                await AdminService.activateUser(id);
+            }
+            fetchUsers();
+        } catch (error) {
+            console.error(`Error performing ${action}:`, error);
+        }
+    };
+
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = (user.firstName + ' ' + user.lastName).toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const isEmployer = user.roles.some(r => r.name === 'ROLE_EMPLOYER');
+        const isJobSeeker = user.roles.some(r => r.name === 'ROLE_JOBSEEKER');
+
+        let matchesRole = true;
+        if (roleFilter === 'Employer') matchesRole = isEmployer;
+        if (roleFilter === 'Job Seeker') matchesRole = isJobSeeker;
+
+        return matchesSearch && matchesRole;
+    });
 
     return (
         <DashboardLayout role="admin">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h3 className="fw-bold">Manage Users</h3>
                 <div className="d-flex gap-2">
-                    <input type="text" className="form-control form-control-sm" placeholder="Search by name or email..." style={{ width: '250px' }} />
-                    <select className="form-select form-select-sm" style={{ width: '150px' }}>
+                    <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="Search by name or email..."
+                        style={{ width: '250px' }}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <select
+                        className="form-select form-select-sm"
+                        style={{ width: '150px' }}
+                        value={roleFilter}
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                    >
                         <option>All Roles</option>
                         <option>Employer</option>
                         <option>Job Seeker</option>
@@ -40,38 +95,49 @@ const AdminUsers = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map(user => (
-                                <tr key={user.id}>
-                                    <td>
-                                        <div className="d-flex align-items-center">
-                                            <div className="bg-light rounded-circle p-2 me-2 text-primary fw-bold" style={{ width: '40px', height: '40px', textAlign: 'center' }}>
-                                                {user.name.split(' ').map(n => n[0]).join('')}
+                            {loading ? (
+                                <tr><td colSpan="5" className="text-center">Loading...</td></tr>
+                            ) : filteredUsers.length > 0 ? (
+                                filteredUsers.map(user => (
+                                    <tr key={user.id}>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <div className="bg-light rounded-circle p-2 me-2 text-primary fw-bold" style={{ width: '40px', height: '40px', textAlign: 'center', lineHeight: '24px' }}>
+                                                    {user.firstName ? user.firstName[0] : ''}{user.lastName ? user.lastName[0] : ''}
+                                                </div>
+                                                <div>
+                                                    <div className="fw-bold">{user.firstName} {user.lastName}</div>
+                                                    <div className="text-muted small">{user.email}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="fw-bold">{user.name}</div>
-                                                <div className="text-muted small">{user.email}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{user.role}</td>
-                                    <td>{user.joined}</td>
-                                    <td>
-                                        <span className={`badge rounded-pill ${user.status === 'Active' ? 'bg-success' :
-                                                user.status === 'Suspended' ? 'bg-warning text-dark' : 'bg-danger'
-                                            }`}>
-                                            {user.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {user.status !== 'Active' ? (
-                                            <button className="btn btn-sm btn-link text-success p-0 me-2" onClick={() => handleStatus(user.id, 'Active')}>Activate</button>
-                                        ) : (
-                                            <button className="btn btn-sm btn-link text-warning p-0 me-2" onClick={() => handleStatus(user.id, 'Suspended')}>Suspend</button>
-                                        )}
-                                        <button className="btn btn-sm btn-link text-danger p-0" onClick={() => handleStatus(user.id, 'Deleted')}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td>
+                                            {user.roles.some(r => r.name === 'ROLE_EMPLOYER') ? (
+                                                <div>
+                                                    <div className="fw-bold text-teal">Employer</div>
+                                                    <div className="small text-muted">{user.company ? user.company.name : 'No Company Profile'}</div>
+                                                </div>
+                                            ) : 'Job Seeker'}
+                                        </td>
+                                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <span className={`badge rounded-pill ${user.isActive ? 'bg-success' : 'bg-warning text-dark'}`}>
+                                                {user.isActive ? 'Active' : 'Suspended'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {!user.isActive ? (
+                                                <button className="btn btn-sm btn-link text-success p-0 me-2" onClick={() => handleStatus(user.id, 'Activate')}>Activate</button>
+                                            ) : (
+                                                <button className="btn btn-sm btn-link text-warning p-0 me-2" onClick={() => handleStatus(user.id, 'Suspend')}>Suspend</button>
+                                            )}
+                                            <button className="btn btn-sm btn-link text-danger p-0" onClick={() => handleStatus(user.id, 'Delete')}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr><td colSpan="5" className="text-center">No users found.</td></tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

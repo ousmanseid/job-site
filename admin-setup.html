@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Admin User Setup</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Step 1: Check User Role</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Email to Check:</label>
+                            <input type="email" id="checkEmail" class="form-control" placeholder="admin@example.com">
+                            <button onclick="checkUserRole()" class="btn btn-info mt-2">Check Role</button>
+                        </div>
+                        <div id="checkResult" class="alert" style="display: none;"></div>
+
+                        <hr class="my-4">
+
+                        <h5>Step 2: Create/Update Admin User</h5>
+                        <form id="adminForm">
+                            <div class="mb-3">
+                                <label class="form-label">Email:</label>
+                                <input type="email" id="email" class="form-control" required
+                                    placeholder="admin@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password:</label>
+                                <input type="password" id="password" class="form-control" required
+                                    placeholder="Enter password">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">First Name:</label>
+                                <input type="text" id="firstName" class="form-control" value="Admin">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Last Name:</label>
+                                <input type="text" id="lastName" class="form-control" value="User">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Create/Update Admin User</button>
+                        </form>
+                        <div id="result" class="alert mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8085/api/auth';
+
+        async function checkUserRole() {
+            const email = document.getElementById('checkEmail').value;
+            const resultDiv = document.getElementById('checkResult');
+
+            if (!email) {
+                alert('Please enter an email');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/check-user-role?email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+
+                if (typeof data === 'string') {
+                    resultDiv.className = 'alert alert-warning';
+                    resultDiv.textContent = data;
+                } else {
+                    resultDiv.className = 'alert alert-info';
+                    resultDiv.innerHTML = `
+                        <strong>User Found:</strong><br>
+                        ID: ${data.id}<br>
+                        Email: ${data.email}<br>
+                        Name: ${data.firstName} ${data.lastName}<br>
+                        Roles: ${data.roles.join(', ')}<br>
+                        Active: ${data.isActive}<br>
+                        Verified: ${data.isVerified}
+                    `;
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const response = await fetch(`${API_URL}/init-admin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        firstName,
+                        lastName
+                    })
+                });
+
+                const data = await response.text();
+
+                if (response.ok) {
+                    resultDiv.className = 'alert alert-success';
+                    resultDiv.textContent = data;
+                    resultDiv.style.display = 'block';
+
+                    // Clear password field
+                    document.getElementById('password').value = '';
+
+                    // Auto-check the user role
+                    document.getElementById('checkEmail').value = email;
+                    setTimeout(() => checkUserRole(), 1000);
+                } else {
+                    resultDiv.className = 'alert alert-danger';
+                    resultDiv.textContent = data;
+                    resultDiv.style.display = 'block';
+                }
+            } catch (error) {
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

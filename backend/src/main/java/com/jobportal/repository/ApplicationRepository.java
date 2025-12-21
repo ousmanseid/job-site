@@ -13,37 +13,43 @@ import java.util.Optional;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
-    
+
+    List<Application> findByApplicant(com.jobportal.model.User applicant);
+
+    List<Application> findByJob(com.jobportal.model.Job job);
+
+    Boolean existsByJobAndApplicant(com.jobportal.model.Job job, com.jobportal.model.User applicant);
+
     Page<Application> findByApplicantId(Long applicantId, Pageable pageable);
-    
+
     Page<Application> findByJobId(Long jobId, Pageable pageable);
-    
+
     @Query("SELECT a FROM Application a WHERE a.job.company.id = :companyId")
     Page<Application> findByCompanyId(@Param("companyId") Long companyId, Pageable pageable);
-    
+
     @Query("SELECT a FROM Application a WHERE a.applicant.id = :applicantId AND a.status = :status")
     Page<Application> findByApplicantIdAndStatus(@Param("applicantId") Long applicantId,
-                                                 @Param("status") Application.ApplicationStatus status,
-                                                 Pageable pageable);
-    
+            @Param("status") Application.ApplicationStatus status,
+            Pageable pageable);
+
     @Query("SELECT a FROM Application a WHERE a.job.id = :jobId AND a.status = :status")
     Page<Application> findByJobIdAndStatus(@Param("jobId") Long jobId,
-                                           @Param("status") Application.ApplicationStatus status,
-                                           Pageable pageable);
-    
+            @Param("status") Application.ApplicationStatus status,
+            Pageable pageable);
+
     Optional<Application> findByJobIdAndApplicantId(Long jobId, Long applicantId);
-    
+
     Boolean existsByJobIdAndApplicantId(Long jobId, Long applicantId);
-    
+
     @Query("SELECT COUNT(a) FROM Application a WHERE a.applicant.id = :applicantId")
     Long countByApplicantId(@Param("applicantId") Long applicantId);
-    
+
     @Query("SELECT COUNT(a) FROM Application a WHERE a.job.id = :jobId")
     Long countByJobId(@Param("jobId") Long jobId);
-    
+
     @Query("SELECT a.status, COUNT(a) FROM Application a WHERE a.applicant.id = :applicantId GROUP BY a.status")
     List<Object[]> getApplicationStatsByApplicantId(@Param("applicantId") Long applicantId);
-    
+
     @Query("SELECT a FROM Application a WHERE a.isShortlisted = true AND a.job.company.id = :companyId")
     Page<Application> findShortlistedByCompany(@Param("companyId") Long companyId, Pageable pageable);
 }

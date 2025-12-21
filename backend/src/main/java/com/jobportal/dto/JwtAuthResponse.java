@@ -10,9 +10,14 @@ import lombok.Data;
 public class JwtAuthResponse {
     private String accessToken;
     private String refreshToken;
+    @Builder.Default
     private String tokenType = "Bearer";
     private Long userId;
     private String email;
     private String firstName;
     private String lastName;
+    private String role;
+    private Boolean isVerified;
+    private String phone;
+    private String city;
 }

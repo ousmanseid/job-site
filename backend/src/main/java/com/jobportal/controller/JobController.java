@@ -48,8 +48,19 @@ public class JobController {
         return ResponseEntity.ok(jobs);
     }
 
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<?> getJobsByCompany(
+            @PathVariable Long companyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Job> jobs = jobRepository.findByCompanyId(companyId, pageable);
+        return ResponseEntity.ok(jobs);
+    }
+
     @GetMapping("/search/advanced")
     public ResponseEntity<?> advancedSearch(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Job.JobType jobType,
             @RequestParam(required = false) Job.WorkMode workMode,
@@ -57,7 +68,7 @@ public class JobController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Job> jobs = jobRepository.advancedSearch(location, jobType, workMode, category, pageable);
+        Page<Job> jobs = jobRepository.advancedSearch(keyword, location, jobType, workMode, category, pageable);
         return ResponseEntity.ok(jobs);
     }
 
