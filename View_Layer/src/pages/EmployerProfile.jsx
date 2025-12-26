@@ -19,7 +19,7 @@ const EmployerProfile = () => {
         website: '',
         industry: '',
         phone: '',
-        profilePicture: ''
+        logo: ''
     });
 
     useEffect(() => {
@@ -41,7 +41,7 @@ const EmployerProfile = () => {
                     website: res.data.website || '',
                     industry: res.data.industry || 'Technology',
                     phone: userRes.data.phone || '',
-                    profilePicture: userRes.data.profilePicture || ''
+                    logo: res.data.logo || ''
                 });
             }
         } catch (error) {
@@ -61,7 +61,8 @@ const EmployerProfile = () => {
                 description: profile.description,
                 location: profile.location,
                 website: profile.website,
-                industry: profile.industry
+                industry: profile.industry,
+                logo: profile.logo
             });
 
             // Update user info (email and phone)
@@ -90,8 +91,8 @@ const EmployerProfile = () => {
         if (file) {
             try {
                 setSaving(true);
-                await UserService.uploadProfilePicture(file);
-                alert('Profile picture updated!');
+                await EmployerService.uploadLogo(file);
+                alert('Company logo updated!');
                 fetchProfile();
             } catch (error) {
                 console.error("Error uploading photo:", error);
@@ -125,11 +126,12 @@ const EmployerProfile = () => {
                                 style={{ width: '150px', height: '150px', border: 'solid 1px #eee' }}
                                 onClick={handlePhotoClick}
                             >
-                                {profile.profilePicture ? (
+                                {profile.logo ? (
                                     <img
-                                        src={profile.profilePicture.startsWith('http') ? profile.profilePicture : `http://localhost:8085${profile.profilePicture}`}
+                                        src={profile.logo}
                                         alt="Profile"
                                         className="w-100 h-100 object-fit-cover"
+                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=Company'; }}
                                     />
                                 ) : (
                                     <i className="bi bi-building fs-1 text-muted"></i>

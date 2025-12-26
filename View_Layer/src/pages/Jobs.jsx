@@ -187,8 +187,17 @@ const Jobs = () => {
                                 <div key={job.id} className="card border-0 shadow-sm-hover transition-all p-4 rounded-4 bg-white-hover">
                                     <div className="d-flex justify-content-between">
                                         <div className="d-flex gap-3">
-                                            <div className="bg-light rounded p-3 d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px' }}>
-                                                <i className="bi bi-building fs-3 text-secondary"></i>
+                                            <div className="bg-light rounded p-2 d-flex align-items-center justify-content-center" style={{ width: '60px', height: '60px' }}>
+                                                {job.company?.logo ? (
+                                                    <img
+                                                        src={job.company.logo}
+                                                        alt="Logo"
+                                                        className="w-100 h-100 object-fit-contain"
+                                                        onError={(e) => { e.target.src = "https://via.placeholder.com/60?text=Logo"; }}
+                                                    />
+                                                ) : (
+                                                    <i className="bi bi-building fs-3 text-secondary"></i>
+                                                )}
                                             </div>
                                             <div>
                                                 <h5 className="fw-bold mb-1">{job.title}</h5>
@@ -201,8 +210,10 @@ const Jobs = () => {
                                             </div>
                                         </div>
                                         <div className="text-end">
-                                            <div className="text-muted small mb-3">{new Date(job.createdAt).toLocaleDateString()}</div>
-                                            <Link to={`/jobs/${job.id}`} className="btn btn-teal text-white px-4">Details</Link>
+                                            <div className="text-muted small mb-3">
+                                                {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently'}
+                                            </div>
+                                            <Link to={`/jobs/${job.id}`} className="btn btn-teal text-white px-4 rounded-pill shadow-sm">Details</Link>
                                         </div>
                                     </div>
                                 </div>

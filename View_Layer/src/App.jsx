@@ -26,6 +26,7 @@ import AdminSettings from './pages/AdminSettings'
 import AdminCVTemplates from './pages/AdminCVTemplates'
 import AdminUsers from './pages/AdminUsers'
 import AdminApprovals from './pages/AdminApprovals'
+import AdminBlogs from './pages/AdminBlogs'
 import JobSeekerProfileView from './pages/JobSeekerProfileView'
 import EmployerEditJob from './pages/EmployerEditJob'
 import BlogDetails from './pages/BlogDetails'
@@ -186,6 +187,14 @@ const AppContent = () => {
                             element={
                                 <ProtectedRoute allowedRoles={['admin']}>
                                     <AdminUsers />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/admin/blogs"
+                            element={
+                                <ProtectedRoute allowedRoles={['admin']}>
+                                    <AdminBlogs />
                                 </ProtectedRoute>
                             }
                         />

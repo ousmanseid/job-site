@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 @RestController
@@ -23,6 +25,9 @@ public class EmployerController {
 
         @Autowired
         private UserService userService;
+
+        @Value("${app.company.dir}")
+        private String companyDir;
 
         @GetMapping("/stats")
         public ResponseEntity<?> getEmployerStats(Authentication authentication) {
@@ -143,6 +148,18 @@ public class EmployerController {
                         return ResponseEntity.ok(employerService.updateProfile(profileData, user));
                 } catch (RuntimeException e) {
                         return ResponseEntity.badRequest().body(e.getMessage());
+                }
+        }
+
+        @PostMapping("/profile/logo")
+        public ResponseEntity<?> uploadLogo(@RequestParam("file") MultipartFile file,
+                        Authentication authentication) {
+                try {
+                        User user = userService.findByEmail(authentication.getName());
+                        String logoUrl = employerService.uploadLogo(file, user, companyDir);
+                        return ResponseEntity.ok(Map.of("logo", logoUrl));
+                } catch (Exception e) {
+                        return ResponseEntity.status(500).body("Could not upload file: " + e.getMessage());
                 }
         }
 }

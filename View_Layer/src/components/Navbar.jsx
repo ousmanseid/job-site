@@ -55,16 +55,18 @@ const Navbar = () => {
                         )}
                         <li className="nav-item"><Link className="nav-link" to="/blog">Blog</Link></li>
                     </ul>
-                    <div className="d-flex align-items-center flex-column flex-lg-row gap-3 mt-3 mt-lg-0">
+                    <div className="d-flex align-items-center flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
                         {user ? (
-                            <>
-                                <span className="fw-bold">Hi, {user.name || 'User'}</span>
-                                <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">Logout</button>
-                            </>
+                            <div className="d-flex align-items-center gap-3">
+                                <span className="fw-medium text-dark small">Welcome, <span className="fw-bold text-teal">{user.name || 'User'}</span></span>
+                                <button onClick={handleLogout} className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1">Logout</button>
+                            </div>
                         ) : (
                             <>
-                                <Link to="/login" className="btn-nav-login">Login</Link>
-                                <Link to="/register" className="btn-nav-register text-decoration-none">Register</Link>
+                                <Link to="/login" className="btn btn-nav-login-new rounded-pill px-4 fw-bold me-2">Login</Link>
+                                <Link to="/register" className="btn btn-nav-register-new rounded-pill px-4 fw-bold shadow-teal">
+                                    <i className="bi bi-person-plus me-2"></i>Register
+                                </Link>
                             </>
                         )}
                     </div>

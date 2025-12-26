@@ -43,6 +43,16 @@ const updateJob = (id, jobData) => {
     return axios.put(API_URL + `jobs/${id}`, jobData);
 };
 
+const uploadLogo = (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axios.post(API_URL + 'profile/logo', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+};
+
 const EmployerService = {
     getStats,
     getRecentActivity,
@@ -53,7 +63,8 @@ const EmployerService = {
     postJob,
     updateJobStatus,
     getProfile,
-    updateProfile
+    updateProfile,
+    uploadLogo
 };
 
 export default EmployerService;

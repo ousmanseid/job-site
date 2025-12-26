@@ -28,7 +28,9 @@ let jobs = [
         workMode: 'HYBRID',
         category: 'Software Development',
         salaryMin: 120000,
-        salaryMax: 160000
+        salaryMax: 160000,
+        createdAt: "2024-12-10T10:00:00Z",
+        applicationCount: 5
     },
     {
         id: 2,
@@ -41,7 +43,9 @@ let jobs = [
         workMode: 'REMOTE',
         category: 'DevOps',
         salaryMin: 100000,
-        salaryMax: 140000
+        salaryMax: 140000,
+        createdAt: "2024-12-12T14:00:00Z",
+        applicationCount: 3
     },
     {
         id: 3,
@@ -54,7 +58,9 @@ let jobs = [
         workMode: 'REMOTE',
         category: 'Frontend Development',
         salaryMin: 80000,
-        salaryMax: 110000
+        salaryMax: 110000,
+        createdAt: "2024-12-14T11:00:00Z",
+        applicationCount: 12
     },
     {
         id: 4,
@@ -67,7 +73,72 @@ let jobs = [
         workMode: 'HYBRID',
         category: 'Design',
         salaryMin: 75000,
-        salaryMax: 105000
+        salaryMax: 105000,
+        createdAt: "2024-12-15T16:00:00Z",
+        applicationCount: 8
+    }
+];
+
+let blogs = [
+    {
+        id: 1,
+        title: "Top 10 Skills Employers Are Looking For in 2024",
+        category: "Career Advice",
+        author: "Sarah Johnson",
+        imageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
+        summary: "The job market is constantly evolving. Discover the essential skills that will set you apart.",
+        content: "<p>Artificial Intelligence Literacy and Emotional Intelligence are top of the list. In today's rapidly changing job market, employers are seeking candidates who can adapt and grow with emerging technologies while maintaining strong interpersonal skills.</p><p>Key skills include: AI/ML understanding, data analysis, cloud computing, cybersecurity awareness, and soft skills like communication, leadership, and problem-solving.</p>",
+        createdAt: "2024-12-15T10:00:00Z"
+    },
+    {
+        id: 2,
+        title: "How to Ace Your Next Job Interview",
+        category: "Interview Tips",
+        author: "Michael Chen",
+        imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
+        summary: "Master the art of interviewing with these proven strategies and tips from industry experts.",
+        content: "<p>Preparation is key to interview success. Research the company thoroughly, practice common interview questions, and prepare thoughtful questions to ask your interviewer.</p><p>Remember to dress professionally, arrive early, maintain good eye contact, and follow up with a thank-you email within 24 hours.</p>",
+        createdAt: "2024-12-18T14:30:00Z"
+    },
+    {
+        id: 3,
+        title: "Remote Work: Best Practices for Productivity",
+        category: "Work Culture",
+        author: "Emily Rodriguez",
+        imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
+        summary: "Learn how to stay productive and maintain work-life balance while working from home.",
+        content: "<p>Remote work offers flexibility but requires discipline. Create a dedicated workspace, establish a routine, and set clear boundaries between work and personal time.</p><p>Use productivity tools, take regular breaks, and stay connected with your team through video calls and collaboration platforms.</p>",
+        createdAt: "2024-12-20T09:15:00Z"
+    },
+    {
+        id: 4,
+        title: "Navigating Career Transitions Successfully",
+        category: "Career Advice",
+        author: "David Thompson",
+        imageUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+        summary: "Thinking about changing careers? Here's your comprehensive guide to making a smooth transition.",
+        content: "<p>Career transitions can be challenging but rewarding. Start by identifying transferable skills, networking in your target industry, and considering additional training or certifications.</p><p>Update your resume to highlight relevant experience, be patient with the process, and don't be afraid to start in a junior position to gain industry experience.</p>",
+        createdAt: "2024-12-22T11:45:00Z"
+    },
+    {
+        id: 5,
+        title: "Building Your Personal Brand on LinkedIn",
+        category: "Professional Development",
+        author: "Jessica Martinez",
+        imageUrl: "https://images.unsplash.com/photo-1611944212129-29977ae1398c?auto=format&fit=crop&w=800&q=80",
+        summary: "Leverage LinkedIn to showcase your expertise and attract career opportunities.",
+        content: "<p>Your LinkedIn profile is your digital business card. Optimize your headline, write a compelling summary, and regularly share industry insights and achievements.</p><p>Engage with your network by commenting on posts, joining relevant groups, and publishing articles that demonstrate your expertise.</p>",
+        createdAt: "2024-12-23T16:20:00Z"
+    },
+    {
+        id: 6,
+        title: "The Future of AI in the Workplace",
+        category: "Technology",
+        author: "Dr. Robert Kim",
+        imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
+        summary: "Explore how artificial intelligence is reshaping industries and creating new job opportunities.",
+        content: "<p>AI is not replacing jobs—it's transforming them. Understanding AI tools and how to work alongside them is becoming essential across all industries.</p><p>From automated customer service to predictive analytics, AI is creating efficiency while opening new roles in AI ethics, machine learning engineering, and data science.</p>",
+        createdAt: "2024-12-24T08:00:00Z"
     }
 ];
 
@@ -177,6 +248,51 @@ const server = http.createServer((req, res) => {
             users.push(userData);
             res.writeHead(201, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ message: 'User registered successfully' }));
+        }
+
+        // Blog Endpoints
+        else if (path === '/api/blogs' && req.method === 'GET') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(blogs));
+        } else if (path.startsWith('/api/blogs/') && req.method === 'GET') {
+            const id = parseInt(path.split('/').pop());
+            const blog = blogs.find(b => b.id === id);
+            if (blog) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(blog));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Blog not found' }));
+            }
+        } else if (path === '/api/blogs' && req.method === 'POST') {
+            const newBlog = payload;
+            newBlog.id = blogs.length > 0 ? Math.max(...blogs.map(b => b.id)) + 1 : 1;
+            newBlog.createdAt = new Date().toISOString();
+            blogs.push(newBlog);
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(newBlog));
+        } else if (path.startsWith('/api/blogs/') && req.method === 'PUT') {
+            const id = parseInt(path.split('/').pop());
+            const index = blogs.findIndex(b => b.id === id);
+            if (index !== -1) {
+                blogs[index] = { ...blogs[index], ...payload, updatedAt: new Date().toISOString() };
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(blogs[index]));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Blog not found' }));
+            }
+        } else if (path.startsWith('/api/blogs/') && req.method === 'DELETE') {
+            const id = parseInt(path.split('/').pop());
+            const index = blogs.findIndex(b => b.id === id);
+            if (index !== -1) {
+                blogs.splice(index, 1);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Blog deleted' }));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Blog not found' }));
+            }
         }
 
         // Employer Endpoints

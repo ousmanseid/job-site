@@ -71,6 +71,7 @@ const DashboardLayout = ({ children, role }) => {
         ],
         admin: [
             { icon: 'bi-grid-fill', label: 'Dashboard', path: '/dashboard/admin' },
+            { icon: 'bi-journal-text', label: 'Manage Blogs', path: '/dashboard/admin/blogs' },
             { icon: 'bi-file-earmark-text-fill', label: 'CV Templates', path: '/dashboard/admin/cv' },
             { icon: 'bi-people-fill', label: 'Manage Users', path: '/dashboard/admin/users' },
             { icon: 'bi-check-circle-fill', label: 'Approvals', path: '/dashboard/admin/approvals' },

@@ -4,6 +4,8 @@ import com.jobportal.model.Company;
 import com.jobportal.model.Job;
 import com.jobportal.model.Role;
 import com.jobportal.model.User;
+import com.jobportal.repository.BlogRepository;
+import com.jobportal.model.Blog;
 import com.jobportal.repository.CompanyRepository;
 import com.jobportal.repository.JobRepository;
 import com.jobportal.repository.RoleRepository;
@@ -35,6 +37,9 @@ public class DataSeeder implements CommandLineRunner {
         private JobRepository jobRepository;
 
         @Autowired
+        private BlogRepository blogRepository;
+
+        @Autowired
         private PasswordEncoder passwordEncoder;
 
         @Override
@@ -44,6 +49,7 @@ public class DataSeeder implements CommandLineRunner {
                 seedUsers();
                 seedCompanies();
                 seedJobs();
+                seedBlogs();
         }
 
         private void seedRoles() {
@@ -108,7 +114,7 @@ public class DataSeeder implements CommandLineRunner {
                                                 .website("https://techcorp.com")
                                                 .companySize("500-1000")
                                                 .isVerified(true)
-                                                .verificationStatus(Company.VerificationStatus.APPROVED)
+                                                .logo("https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&w=200&h=200&q=80")
                                                 .user(employer)
                                                 .build();
                                 companyRepository.save(company);
@@ -138,6 +144,37 @@ public class DataSeeder implements CommandLineRunner {
                                                 .build();
                                 jobRepository.save(job);
                         }
+                }
+        }
+
+        private void seedBlogs() {
+                if (blogRepository.count() == 0) {
+                        blogRepository.save(Blog.builder()
+                                        .title("How to Ace Your Next Job Interview")
+                                        .author("Career Expert")
+                                        .category("Interview Tips")
+                                        .summary("Learn the top strategies to impress your interviewers and land your dream job.")
+                                        .content("<p>Interviews can be stressful, but with the right preparation, you can shine...</p>")
+                                        .imageUrl("https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80")
+                                        .build());
+
+                        blogRepository.save(Blog.builder()
+                                        .title("The Future of Remote Work in 2025")
+                                        .author("Industry Analyst")
+                                        .category("Industry Trends")
+                                        .summary("Remote work is evolving. Discover what to expect in the coming years.")
+                                        .content("<p>As we move into 2025, remote work continues to redefine the workplace...</p>")
+                                        .imageUrl("https://images.unsplash.com/photo-1593642532400-2682810df593?auto=format&fit=crop&w=800&q=80")
+                                        .build());
+
+                        blogRepository.save(Blog.builder()
+                                        .title("Crafting a Standout Resume")
+                                        .author("HR Specialist")
+                                        .category("Resume Tips")
+                                        .summary("Tips and tricks to make your resume get noticed by recruiters.")
+                                        .content("<p>Your resume is your first impression. Make it count with these tips...</p>")
+                                        .imageUrl("https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80")
+                                        .build());
                 }
         }
 }

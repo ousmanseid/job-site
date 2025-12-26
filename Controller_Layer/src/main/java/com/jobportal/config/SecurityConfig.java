@@ -57,7 +57,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/public/**", "/jobs/**", "/companies/**", "/uploads/**")
+                        .requestMatchers("/auth/**", "/public/**", "/jobs/**", "/companies/**", "/blogs/**",
+                                "/uploads/**", "/contact/**")
                         .permitAll()
                         // Temporary: Allow access to user role management endpoints for fixing missing
                         // roles

@@ -122,7 +122,7 @@ const JobSeekerProfile = () => {
                         <div className="position-relative d-inline-block mb-3">
                             <div className="bg-light rounded-circle d-flex align-items-center justify-content-center border overflow-hidden shadow-sm" style={{ width: '130px', height: '130px' }}>
                                 {profile.profilePicture ? (
-                                    <img src={profile.profilePicture} alt="Profile" className="w-100 h-100 object-fit-cover" />
+                                    <img src={profile.profilePicture} alt="Profile" className="w-100 h-100 object-fit-cover" onError={(e) => { e.target.src = "https://via.placeholder.com/130?text=User"; }} />
                                 ) : (
                                     <i className="bi bi-person display-4 text-secondary"></i>
                                 )}

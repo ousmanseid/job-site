@@ -62,10 +62,11 @@ const JobSeekerProfileView = () => {
                         <div className="mb-3">
                             {profile.profilePicture ? (
                                 <img
-                                    src={profile.profilePicture.startsWith('http') ? profile.profilePicture : `http://localhost:8085${profile.profilePicture}`}
+                                    src={profile.profilePicture}
                                     alt="Profile"
                                     className="rounded-circle shadow-sm"
                                     style={{ width: '120px', height: '120px', objectFit: 'cover', border: '4px solid #f8f9fa' }}
+                                    onError={(e) => { e.target.src = "https://via.placeholder.com/120?text=User"; }}
                                 />
                             ) : (
                                 <div className="rounded-circle bg-light d-inline-flex align-items-center justify-content-center border" style={{ width: '120px', height: '120px' }}>

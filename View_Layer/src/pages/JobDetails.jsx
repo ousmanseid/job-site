@@ -201,7 +201,23 @@ const JobDetails = () => {
                                     </div>
 
                                     <div className="card border p-4 rounded-4 bg-white shadow-sm">
-                                        <h6 className="fw-bold mb-2">About {job.company?.name || 'the Company'}</h6>
+                                        <div className="d-flex align-items-center mb-3">
+                                            <div className="bg-light rounded-3 p-2 me-3" style={{ width: '60px', height: '60px' }}>
+                                                {job.company?.logo ? (
+                                                    <img
+                                                        src={job.company.logo}
+                                                        alt="Logo"
+                                                        className="w-100 h-100 object-fit-contain"
+                                                        onError={(e) => { e.target.src = "https://via.placeholder.com/60?text=Logo"; }}
+                                                    />
+                                                ) : (
+                                                    <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                                                        <i className="bi bi-building text-primary fs-3"></i>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <h6 className="fw-bold mb-0">About {job.company?.name || 'the Company'}</h6>
+                                        </div>
                                         <p className="mb-0 small text-muted lh-base">
                                             {job.company?.description || 'This company has not provided a description yet.'}
                                         </p>

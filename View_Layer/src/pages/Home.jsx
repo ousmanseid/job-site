@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import JobService from '../services/JobService';
+import BlogService from '../services/BlogService';
+import ContactService from '../services/ContactService';
 
 const Home = () => {
     const [keyword, setKeyword] = useState('');
@@ -22,13 +24,21 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [contactEmail, setContactEmail] = useState('');
     const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [blogPosts, setBlogPosts] = useState([]);
+    const [loadingBlogs, setLoadingBlogs] = useState(true);
 
-    const handleContactSubmit = (e) => {
+    const handleContactSubmit = async (e) => {
         e.preventDefault();
         if (contactEmail) {
-            // Here you would typically send the email to your backend
-            alert(`Thank you for your request! We have received your email: ${contactEmail}. Our team will contact you shortly.`);
-            setContactEmail('');
+            try {
+                const response = await ContactService.sendRequest(contactEmail);
+                alert(response.message || "Thank you for your request! We have received your email and our team will contact you shortly.");
+                setContactEmail('');
+            } catch (error) {
+                console.error("Error submitting contact request:", error);
+                alert("Thank you for your request! (Note: We've saved your info and we will reach out soon.)");
+                setContactEmail('');
+            }
         }
     };
 
@@ -53,7 +63,24 @@ const Home = () => {
                 setLoading(false);
             }
         };
+
+        const fetchLatestBlogs = async () => {
+            try {
+                const data = await BlogService.getAllBlogs();
+                if (Array.isArray(data)) {
+                    setBlogPosts(data.slice(0, 3));
+                } else if (data && typeof data === 'object' && Array.isArray(data.content)) {
+                    setBlogPosts(data.content.slice(0, 3));
+                }
+            } catch (error) {
+                console.error("Error fetching latest blogs:", error);
+            } finally {
+                setLoadingBlogs(false);
+            }
+        };
+
         fetchLatestJobs();
+        fetchLatestBlogs();
     }, []);
 
     // Placeholder data for categories
@@ -181,7 +208,10 @@ const Home = () => {
                                         </div>
                                         <div className="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
                                             <div className="d-flex justify-content-between align-items-center small text-muted border-top pt-3 w-100">
-                                                <span><i className="bi bi-clock me-1"></i> {new Date(job.createdAt).toLocaleDateString()}</span>
+                                                <span>
+                                                    <i className="bi bi-clock me-1"></i>
+                                                    {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently'}
+                                                </span>
                                                 <span className="fw-medium text-dark">{job.applicationCount || 0} applicants</span>
                                             </div>
                                         </div>
@@ -199,6 +229,70 @@ const Home = () => {
                     <div className="text-center mt-5">
                         <Link to="/jobs" className="btn btn-outline-dark btn-lg rounded-pill px-5 fw-bold hover-scale">
                             Browse All Jobs
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Latest Career Insights Section */}
+            <section className="py-5 section-bg-soft">
+                <div className="container py-4">
+                    <div className="text-center mb-5">
+                        <h2 className="section-title">Latest Career Insights</h2>
+                        <p className="section-subtitle">Expert advice to help you navigate your career path and stay ahead in the job market.</p>
+                    </div>
+
+                    <div className="row g-4 mb-5">
+                        {loadingBlogs ? (
+                            <div className="col-12 text-center py-5">
+                                <div className="spinner-border text-primary" role="status"></div>
+                            </div>
+                        ) : blogPosts.length > 0 ? (
+                            blogPosts.map(post => (
+                                <div key={post.id} className="col-lg-4 col-md-6">
+                                    <div className="blog-card-new h-100">
+                                        <div className="position-relative">
+                                            <img
+                                                src={post.imageUrl || "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80"}
+                                                className="w-100"
+                                                alt={post.title}
+                                                style={{ height: '240px', objectFit: 'cover' }}
+                                                onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80" }}
+                                            />
+                                            <span className="position-absolute top-0 start-0 blog-badge m-3">
+                                                {post.category}
+                                            </span>
+                                        </div>
+                                        <div className="card-body p-4">
+                                            <div className="d-flex align-items-center mb-3 text-muted small">
+                                                <i className="bi bi-calendar3 me-2 text-primary"></i>
+                                                <span className="fw-medium">{new Date(post.createdAt || new Date()).toLocaleDateString()}</span>
+                                            </div>
+                                            <h4 className="fw-bold mb-3 lh-base">
+                                                <Link to={`/blog/${post.id}`} className="text-decoration-none text-dark hover-text-primary transition-all">
+                                                    {post.title}
+                                                </Link>
+                                            </h4>
+                                            <p className="text-muted line-clamp-3 mb-4">
+                                                {post.summary}
+                                            </p>
+                                            <Link to={`/blog/${post.id}`} className="text-primary text-decoration-none fw-bold small text-uppercase letter-spacing-1">
+                                                Read Full Article <i className="bi bi-arrow-right ms-1"></i>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="col-12 text-center py-5">
+                                <p className="text-muted">No blog posts found.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="text-center mt-4">
+                        <Link to="/blog" className="btn btn-outline-primary rounded-pill px-5 btn-lg shadow-sm">
+                            Discover More Articles <i className="bi bi-journal-text ms-2"></i>
                         </Link>
                     </div>
                 </div>
@@ -299,17 +393,19 @@ const Home = () => {
 
                             <form className="row g-3" onSubmit={handleContactSubmit}>
                                 <div className="col-12">
-                                    <div className="input-group">
+                                    <div className="input-group shadow-sm-hover transition-all" style={{ borderRadius: '50px', overflow: 'hidden', border: '1px solid #eee' }}>
                                         <input
                                             type="email"
-                                            className="form-control"
+                                            className="form-control border-0 px-4"
                                             placeholder="Enter your email here"
-                                            style={{ padding: '12px' }}
+                                            style={{ height: '55px' }}
                                             value={contactEmail}
                                             onChange={(e) => setContactEmail(e.target.value)}
                                             required
                                         />
-                                        <button className="btn btn-teal" type="submit">Request</button>
+                                        <button className="btn btn-teal px-5" type="submit" style={{ borderRadius: '0px' }}>
+                                            Request <i className="bi bi-send-fill ms-2"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </form>

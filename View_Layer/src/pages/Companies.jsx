@@ -82,7 +82,12 @@ const Companies = () => {
                             <div className="card h-100 border-0 shadow-sm p-4 text-center hover-card transition-all">
                                 <div className="mx-auto bg-light rounded-circle p-3 mb-3 d-flex align-items-center justify-content-center" style={{ width: '80px', height: '80px' }}>
                                     {company.logo ? (
-                                        <img src={company.logo} alt={company.name} className="img-fluid rounded-circle" />
+                                        <img
+                                            src={company.logo}
+                                            alt={company.name}
+                                            className="w-100 h-100 object-fit-contain"
+                                            onError={(e) => { e.target.src = "https://via.placeholder.com/80?text=Company"; }}
+                                        />
                                     ) : (
                                         <span className="fw-bold fs-3 text-secondary">{company.name.charAt(0)}</span>
                                     )}

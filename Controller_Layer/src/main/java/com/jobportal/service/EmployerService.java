@@ -13,10 +13,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class EmployerService {
@@ -156,6 +162,7 @@ public class EmployerService {
         profile.put("location", company.getCity());
         profile.put("website", company.getWebsite());
         profile.put("industry", company.getIndustry());
+        profile.put("logo", company.getLogo());
 
         return profile;
     }
@@ -174,7 +181,27 @@ public class EmployerService {
             company.setWebsite(profileData.get("website"));
         if (profileData.containsKey("industry"))
             company.setIndustry(profileData.get("industry"));
+        if (profileData.containsKey("logo"))
+            company.setLogo(profileData.get("logo"));
 
         return companyRepository.save(company);
+    }
+
+    public String uploadLogo(MultipartFile file, User user, String companyDir) throws IOException {
+        Company company = companyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("Company profile not found"));
+
+        Path root = Paths.get(companyDir);
+        if (!Files.exists(root)) {
+            Files.createDirectories(root);
+        }
+
+        String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Files.copy(file.getInputStream(), root.resolve(filename));
+
+        String url = "/api/uploads/companies/" + filename;
+        company.setLogo(url);
+        companyRepository.save(company);
+        return url;
     }
 }
