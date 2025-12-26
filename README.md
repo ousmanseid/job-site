@@ -40,7 +40,7 @@ The Smart Job Portal is a large-scale enterprise application featuring:
 
 ```
 Job-Portal-System/
-├── frontend/           # Frontend application
+├── View_Layer/         # Frontend application (MVC: View)
 │   ├── assets/         # CSS, JS, images
 │   ├── pages/          # HTML pages
 │   │   ├── public/     # Public pages (login, register)
@@ -48,7 +48,7 @@ Job-Portal-System/
 │   │   ├── employer/   # Employer dashboard
 │   │   └── admin/      # Admin panel
 │   └── index.html      # Landing page
-├── backend/            # Spring Boot backend
+├── Controller_Layer/   # Spring Boot backend (MVC: Controller/Logic)
 │   ├── src/main/java/  # Java source code
 │   │   └── com/jobportal/
 │   │       ├── controller/   # REST controllers
@@ -62,7 +62,7 @@ Job-Portal-System/
 │   ├── src/main/resources/
 │   │   └── application.properties
 │   └── pom.xml         # Maven dependencies
-└── database/           # Database scripts
+└── Model_Layer/        # Database scripts (MVC: Model/Data)
     ├── schema.sql      # Database schema
     └── data.sql        # Sample data
 ```
@@ -81,14 +81,14 @@ Job-Portal-System/
 1. **Configure Database**
    ```bash
    # Create database
-   mysql -u root -p < database/schema.sql
+   mysql -u root -p < Model_Layer/schema.sql
    
    # Load sample data
-   mysql -u root -p job_portal_db < database/data.sql
+   mysql -u root -p job_portal_db < Model_Layer/data.sql
    ```
 
 2. **Update Configuration**
-   Edit `backend/src/main/resources/application.properties`:
+   Edit `Controller_Layer/src/main/resources/application.properties`:
    ```properties
    spring.datasource.username=YOUR_USERNAME
    spring.datasource.password=YOUR_PASSWORD
@@ -96,7 +96,7 @@ Job-Portal-System/
 
 3. **Build and Run**
    ```bash
-   cd backend
+   cd Controller_Layer
    mvn clean install
    mvn spring-boot:run
    ```
@@ -107,7 +107,7 @@ Job-Portal-System/
 
 1. **Start a Local Server**
    ```bash
-   cd frontend
+   cd View_Layer
    # Using Python
    python3 -m http.server 3000
    
